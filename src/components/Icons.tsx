@@ -1,12 +1,23 @@
-import type { SvgIconProps } from '@mui/material'
-import { SvgIcon } from '@mui/material'
-import type { FC } from 'react'
+import clsx from 'clsx'
+import type { FC, SVGProps } from 'react'
 
-const BaseIcon: FC<SvgIconProps> = ({ d, ...props }) => {
+type SvgIconProps = SVGProps<SVGSVGElement> & {
+  d?: string
+  size?: 'small' | 'medium'
+}
+
+const BaseIcon: FC<SvgIconProps> = ({ d, size = 'medium', className, ...props }) => {
   return (
-    <SvgIcon {...props}>
+    <svg
+      width='1em'
+      height='1em'
+      viewBox='0 0 24 24'
+      focusable={false}
+      className={clsx('jv-icon', `jv-icon-${size}`, className)}
+      {...props}
+    >
       <path d={d} />
-    </SvgIcon>
+    </svg>
   )
 }
 

@@ -1,4 +1,3 @@
-import { InputBase } from '@mui/material'
 import type { ChangeEventHandler, ComponentType, FC, KeyboardEvent } from 'react'
 import { memo, useCallback } from 'react'
 
@@ -6,7 +5,6 @@ import { useJsonViewerStore } from '../../stores/JsonViewerStore'
 import type { Colorspace } from '../../theme/base16'
 import type { DataItemProps, DataType, EditorProps } from '../../type'
 import { DataTypeLabel } from '../DataTypeLabel'
-import { DataBox } from '../mui/DataBox'
 
 export type EasyTypeConfig<Value> = Pick<DataType<Value>, 'is' | 'serialize' | 'deserialize'> & {
   type: string
@@ -41,9 +39,9 @@ export function defineEasyType<Value> ({
     const onSelect = useJsonViewerStore(store => store.onSelect)
 
     return (
-      <DataBox onClick={() => onSelect?.(props.path, props.value)} sx={{ color }}>
+      <span className='jv-inline-block' onClick={() => onSelect?.(props.path, props.value)} style={{ color }}>
         {(displayTypeLabel && storeDisplayDataTypes) && <DataTypeLabel dataType={type} />}
-        <DataBox className={`${type}-value`}>
+        <span className={`${type}-value jv-inline-block`}>
           <Render
             path={props.path}
             inspect={props.inspect}
@@ -51,8 +49,8 @@ export function defineEasyType<Value> ({
             value={props.value}
             prevValue={props.prevValue}
           />
-        </DataBox>
-      </DataBox>
+        </span>
+      </span>
     )
   }
   EasyType.displayName = `easy-${type}-type`
@@ -65,8 +63,6 @@ export function defineEasyType<Value> ({
   }
 
   const EasyTypeEditor: FC<EditorProps<string>> = ({ value, setValue, abortEditing, commitEditing }) => {
-    const color = useJsonViewerStore(store => store.colorspace[colorKey])
-
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       if (event.key === 'Enter') {
         event.preventDefault()
@@ -84,23 +80,13 @@ export function defineEasyType<Value> ({
     }, [setValue])
 
     return (
-      <InputBase
+      <textarea
         autoFocus
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        size='small'
-        multiline
-        sx={{
-          color,
-          padding: 0.5,
-          borderStyle: 'solid',
-          borderColor: 'black',
-          borderWidth: 1,
-          fontSize: '0.8rem',
-          fontFamily: 'monospace',
-          display: 'inline-flex'
-        }}
+        className='jv-easy-type-editor'
+        style={{ color: `var(--jv-${colorKey})` }}
       />
     )
   }

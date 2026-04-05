@@ -69,18 +69,12 @@
     "*.{ts,tsx,js,jsx}": "npx eslint --cache --fix"
   },
   "peerDependencies": {
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
-    "@mui/material": "^6",
     "react": "^17 || ^18 || ^19",
     "react-dom": "^17 || ^18 || ^19"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/material": "^6.4.11",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^15.3.1",

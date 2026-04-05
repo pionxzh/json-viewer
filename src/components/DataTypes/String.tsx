@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import clsx from 'clsx'
 import { useState } from 'react'
 
 import { useJsonViewerStore } from '../../stores/JsonViewerStore'
@@ -18,12 +18,8 @@ export const stringType = defineEasyType<string>({
       : props.value.slice(0, collapseStringsAfterLength)
     const hasRest = props.value.length > collapseStringsAfterLength
     return (
-      <Box
-        component='span'
-        sx={{
-          overflowWrap: 'anywhere',
-          cursor: hasRest ? 'pointer' : 'inherit'
-        }}
+      <span
+        className={clsx('jv-type-string', hasRest && 'jv-expandable')}
         onClick={() => {
           if (window.getSelection()?.type === 'Range') {
             return
@@ -36,9 +32,9 @@ export const stringType = defineEasyType<string>({
       >
         &quot;
         {value}
-        {hasRest && !showRest && (<Box component='span' sx={{ padding: 0.5 }}>…</Box>)}
+        {hasRest && !showRest && (<span className='jv-ellipsis'>…</span>)}
         &quot;
-      </Box>
+      </span>
     )
   }
 })

@@ -1,15 +1,13 @@
-import { Box } from '@mui/material'
+import clsx from 'clsx'
 import type { FC } from 'react'
 import { useMemo, useState } from 'react'
 
-import { useTextColor } from '../../hooks/useColor'
 import { useIsCycleReference } from '../../hooks/useIsCycleReference'
 import { useJsonViewerStore } from '../../stores/JsonViewerStore'
 import type { DataItemProps, DataType } from '../../type'
 import { getValueSize, segmentArray } from '../../utils'
 import { DataKeyPair } from '../DataKeyPair'
 import { CircularArrowsIcon } from '../Icons'
-import { DataBox } from '../mui/DataBox'
 
 const objectLb = '{'
 const arrayLb = '['
@@ -31,8 +29,6 @@ function inspectMetadata (value: object) {
 }
 
 const PreObjectType: FC<DataItemProps<object>> = (props) => {
-  const metadataColor = useJsonViewerStore(store => store.colorspace.base04)
-  const textColor = useTextColor()
   const isArrayLike = useMemo(() => Array.isArray(props.value) || (props.value instanceof Set), [props.value])
   const isEmptyValue = useMemo(() => getValueSize(props.value) === 0, [props.value])
   const sizeOfValue = useMemo(() => inspectMetadata(props.value), [props.value])
@@ -40,54 +36,35 @@ const PreObjectType: FC<DataItemProps<object>> = (props) => {
   const shouldDisplaySize = useMemo(() => typeof displaySize === 'function' ? displaySize(props.path, props.value) : displaySize, [displaySize, props.path, props.value])
   const isTrap = useIsCycleReference(props.path, props.value)
   return (
-    <Box
-      component='span'
-      className='data-object-start'
-      sx={{
-        letterSpacing: 0.5
-      }}
-    >
+    <span className='jv-object-start data-object-start'>
       {isArrayLike ? arrayLb : objectLb}
       {shouldDisplaySize && props.inspect && !isEmptyValue && (
-        <Box
-          component='span'
-          sx={{
-            pl: 0.5,
-            fontStyle: 'italic',
-            color: metadataColor,
-            userSelect: 'none'
-          }}
-        >
+        <span className='jv-object-size'>
           {sizeOfValue}
-        </Box>
+        </span>
       )}
 
       {isTrap && !props.inspect && (
         <>
           <CircularArrowsIcon
-            sx={{
-              fontSize: 12,
-              color: textColor,
-              mx: 0.5
-            }}
+            size='small'
           />
-          <DataBox
-            sx={{
+          <span
+            className='jv-inline-block'
+            style={{
               cursor: 'pointer',
               userSelect: 'none'
             }}
           >
             {isTrap}
-          </DataBox>
+          </span>
         </>
       )}
-    </Box>
+    </span>
   )
 }
 
 const PostObjectType: FC<DataItemProps<object>> = (props) => {
-  const metadataColor = useJsonViewerStore(store => store.colorspace.base04)
-  const textColor = useTextColor()
   const isArrayLike = useMemo(() => Array.isArray(props.value) || (props.value instanceof Set), [props.value])
   const isEmptyValue = useMemo(() => getValueSize(props.value) === 0, [props.value])
   const sizeOfValue = useMemo(() => inspectMetadata(props.value), [props.value])
@@ -95,33 +72,18 @@ const PostObjectType: FC<DataItemProps<object>> = (props) => {
   const shouldDisplaySize = useMemo(() => typeof displaySize === 'function' ? displaySize(props.path, props.value) : displaySize, [displaySize, props.path, props.value])
 
   return (
-    <Box
-      component='span'
-      className='data-object-end'
-      sx={{
-        lineHeight: 1.5,
-        color: textColor,
-        letterSpacing: 0.5,
-        opacity: 0.8
-      }}
+    <span
+      className='data-object-end jv-object-end'
     >
       {isArrayLike ? arrayRb : objectRb}
       {shouldDisplaySize && (isEmptyValue || !props.inspect)
         ? (
-          <Box
-            component='span'
-            sx={{
-              pl: 0.5,
-              fontStyle: 'italic',
-              color: metadataColor,
-              userSelect: 'none'
-            }}
-          >
+          <span className='jv-object-size'>
             {sizeOfValue}
-          </Box>
+          </span>
           )
         : null}
-    </Box>
+    </span>
   )
 }
 
@@ -130,8 +92,6 @@ function getIterator (value: any): value is Iterable<unknown> {
 }
 
 const ObjectType: FC<DataItemProps<object>> = (props) => {
-  const keyColor = useTextColor()
-  const borderColor = useJsonViewerStore(store => store.colorspace.base02)
   const groupArraysAfterLength = useJsonViewerStore(store => store.groupArraysAfterLength)
   const isTrap = useIsCycleReference(props.path, props.value)
   const [displayLength, setDisplayLength] = useState(useJsonViewerStore(store => store.maxDisplayLength))
@@ -212,20 +172,13 @@ const ObjectType: FC<DataItemProps<object>> = (props) => {
         if (value.length > displayLength) {
           const rest = value.length - displayLength
           elements.push(
-            <DataBox
-              sx={{
-                cursor: 'pointer',
-                lineHeight: 1.5,
-                color: keyColor,
-                letterSpacing: 0.5,
-                opacity: 0.8,
-                userSelect: 'none'
-              }}
+            <span
+              className='jv-object-group'
               key='last'
               onClick={() => setDisplayLength(length => length * 2)}
             >
               hidden {rest} items…
-            </DataBox>
+            </span>
           )
         }
         return elements
@@ -271,20 +224,13 @@ const ObjectType: FC<DataItemProps<object>> = (props) => {
     if (entries.length > displayLength) {
       const rest = entries.length - displayLength
       elements.push(
-        <DataBox
-          sx={{
-            cursor: 'pointer',
-            lineHeight: 1.5,
-            color: keyColor,
-            letterSpacing: 0.5,
-            opacity: 0.8,
-            userSelect: 'none'
-          }}
+        <span
+          className='jv-object-group'
           key='last'
           onClick={() => setDisplayLength(length => length * 2)}
         >
           hidden {rest} items…
-        </DataBox>
+        </span>
       )
     }
     return elements
@@ -296,7 +242,6 @@ const ObjectType: FC<DataItemProps<object>> = (props) => {
     props.nestedIndex,
     groupArraysAfterLength,
     displayLength,
-    keyColor,
     objectSortKeys
   ])
   const marginLeft = props.inspect ? 0.6 : 0
@@ -307,35 +252,29 @@ const ObjectType: FC<DataItemProps<object>> = (props) => {
     return null
   }
   return (
-    <Box
-      className='data-object'
-      sx={{
-        display: props.inspect ? 'block' : 'inline-block',
-        pl: props.inspect ? indentWidth - 0.6 : 0,
-        marginLeft,
-        color: keyColor,
-        borderLeft: props.inspect ? `1px solid ${borderColor}` : 'none'
+    <div
+      className={clsx('data-object', 'jv-object')}
+      data-inspect={props.inspect}
+      style={{
+        paddingLeft: props.inspect ? `calc(${indentWidth - 0.6} * var(--jv-spacing-unit))` : '0'
       }}
     >
       {
         props.inspect
           ? elements
           : !isTrap && (
-            <Box
-              component='span'
-              className='data-object-body'
+            <span
+              className='data-object-body jv-function-collapse'
               onClick={() => props.setInspect(true)}
-              sx={{
-                '&:hover': { cursor: 'pointer' },
-                padding: 0.5,
+              style={{
                 userSelect: 'none'
               }}
             >
               …
-            </Box>
+            </span>
             )
       }
-    </Box>
+    </div>
   )
 }
 

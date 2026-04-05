@@ -2,12 +2,12 @@
  * Use NoSsr on function value.
  *  Because in Next.js SSR, the function will be translated to other type
  */
-import { Box, NoSsr } from '@mui/material'
+import clsx from 'clsx'
 import type { FC } from 'react'
 
-import { useJsonViewerStore } from '../../stores/JsonViewerStore'
 import type { DataItemProps, DataType } from '../../type'
 import { DataTypeLabel } from '../DataTypeLabel'
+import { NoSsr } from '../NoSSR'
 
 const functionBody = (func: Function) => {
   const funcString = func.toString()
@@ -45,16 +45,10 @@ const PreFunctionType: FC<DataItemProps<Function>> = (props) => {
   return (
     <NoSsr>
       <DataTypeLabel dataType='function' />
-      <Box
-        component='span'
-        className='data-function-start'
-        sx={{
-          letterSpacing: 0.5
-        }}
-      >
+      <span className='data-function-start jv-function-header'>
         {functionName(props.value)}
         {' '}{lb}
-      </Box>
+      </span>
     </NoSsr>
   )
 }
@@ -62,41 +56,31 @@ const PreFunctionType: FC<DataItemProps<Function>> = (props) => {
 const PostFunctionType: FC<DataItemProps<Function>> = () => {
   return (
     <NoSsr>
-      <Box component='span' className='data-function-end'>
+      <span className='data-function-end'>
         {rb}
-      </Box>
+      </span>
     </NoSsr>
   )
 }
 
 const FunctionType: FC<DataItemProps<Function>> = (props) => {
-  const functionColor = useJsonViewerStore(store => store.colorspace.base05)
   return (
     <NoSsr>
-      <Box
-        className='data-function'
-        sx={{
-          display: props.inspect ? 'block' : 'inline-block',
-          pl: props.inspect ? 2 : 0,
-          color: functionColor
-        }}
+      <div
+        className={clsx('jv-function', 'data-function')}
+        data-inspect={props.inspect}
       >
         {props.inspect
           ? functionBody(props.value)
           : (
-            <Box
-              component='span'
-              className='data-function-body'
+            <span
+              className='data-function-body jv-function-collapse'
               onClick={() => props.setInspect(true)}
-              sx={{
-                '&:hover': { cursor: 'pointer' },
-                padding: 0.5
-              }}
             >
               …
-            </Box>
+            </span>
             )}
-      </Box>
+      </div>
     </NoSsr>
   )
 }

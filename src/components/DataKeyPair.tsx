@@ -1,8 +1,6 @@
-import { Box } from '@mui/material'
-import type { ComponentProps, FC, MouseEvent } from 'react'
+import type { FC, MouseEvent, PropsWithChildren } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { useTextColor } from '../hooks/useColor'
 import { useClipboard } from '../hooks/useCopyToClipboard'
 import { useInspect } from '../hooks/useInspect'
 import { useJsonViewerStore } from '../stores/JsonViewerStore'
@@ -19,7 +17,6 @@ import {
   EditIcon,
   ExpandMoreIcon
 } from './Icons'
-import { DataBox } from './mui/DataBox'
 
 export type DataKeyPairProps = {
   value: unknown
@@ -30,18 +27,10 @@ export type DataKeyPairProps = {
   last: boolean
 }
 
-type IconBoxProps = ComponentProps<typeof Box>
-
-const IconBox: FC<IconBoxProps> = (props) => (
-  <Box
-    component='span'
-    {...props}
-    sx={{
-      cursor: 'pointer',
-      paddingLeft: '0.7rem',
-      ...props.sx
-    }}
-  />
+const IconBox: FC<PropsWithChildren &{ onClick?: (e: MouseEvent) => void }> = ({ children, onClick }) => (
+  <span className='jv-icon-box' onClick={onClick}>
+    {children}
+  </span>
 )
 
 export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
@@ -77,8 +66,6 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
   const [inspect, setInspect] = useInspect(path, value, nestedIndex)
   const [editing, setEditing] = useState(false)
   const onChange = useJsonViewerStore(store => store.onChange)
-  const keyColor = useTextColor()
-  const numberKeyColor = useJsonViewerStore(store => store.colorspace.base0C)
   const highlightColor = useJsonViewerStore(store => store.colorspace.base0A)
   const displayComma = useJsonViewerStore(store => store.displayComma)
   const quotesOnKeys = useJsonViewerStore(store => store.quotesOnKeys)
@@ -167,7 +154,7 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
 
     return false
   }, [highlightUpdates, prevValue, value])
-  const highlightContainer = useRef<HTMLElement>(undefined)
+  const highlightContainer = useRef<HTMLElement | null>(null)
   useEffect(() => {
     if (highlightContainer.current && isHighlight && 'animate' in highlightContainer.current) {
       highlightContainer.current.animate(
@@ -211,13 +198,13 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
         <>
           <IconBox>
             <CloseIcon
-              sx={{ fontSize: '.8rem' }}
+              size='small'
               onClick={abortEditing}
             />
           </IconBox>
           <IconBox>
             <CheckIcon
-              sx={{ fontSize: '.8rem' }}
+              size='small'
               onClick={() => commitEditing(tempValue)}
             />
           </IconBox>
@@ -241,8 +228,8 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
           >
             {
               copied
-                ? <CheckIcon sx={{ fontSize: '.8rem' }} />
-                : <ContentCopyIcon sx={{ fontSize: '.8rem' }} />
+                ? <CheckIcon size='small' />
+                : <ContentCopyIcon size='small' />
             }
           </IconBox>
         )}
@@ -251,7 +238,7 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
             <IconBox
               onClick={startEditing}
             >
-              <EditIcon sx={{ fontSize: '.8rem' }} />
+              <EditIcon size='small' />
             </IconBox>
           )}
         {enableAdd && (
@@ -261,7 +248,7 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
               onAdd?.(path)
             }}
           >
-            <AddBoxIcon sx={{ fontSize: '.8rem' }} />
+            <AddBoxIcon size='small' />
           </IconBox>
         )}
         {enableDelete && (
@@ -271,7 +258,7 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
               onDelete?.(path, value)
             }}
           >
-            <DeleteIcon sx={{ fontSize: '.9rem' }} />
+            <DeleteIcon size='medium' />
           </IconBox>
         )}
       </>
@@ -310,24 +297,16 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
     nestedIndex
   }), [inspect, path, setInspect, value, prevValue, nestedIndex])
   return (
-    <Box
-      className='data-key-pair'
+    <div
+      className='data-key-pair jv-data-key-pair'
       data-testid={'data-key-pair' + path.join('.')}
-      sx={{ userSelect: 'text' }}
       onMouseEnter={
         useCallback(() => setHover(path, nestedIndex),
           [setHover, path, nestedIndex])
       }
     >
-      <DataBox
-        component='span'
-        className='data-key'
-        sx={{
-          lineHeight: 1.5,
-          color: keyColor,
-          letterSpacing: 0.5,
-          opacity: 0.8
-        }}
+      <span
+        className='data-key jv-data-key'
         onClick={
           useCallback((event: MouseEvent<HTMLSpanElement>) => {
             if (event.isDefaultPrevented()) {
@@ -344,29 +323,22 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
             ? (inspect
                 ? (
                   <ExpandMoreIcon
-                    className='data-key-toggle-expanded'
-                    sx={{
-                      fontSize: '.8rem',
-                      '&:hover': { cursor: 'pointer' }
-                    }}
+                    size='small'
+                    className='data-key-toggle-expanded jv-data-key-toggle'
                   />
                   )
                 : (
                   <ChevronRightIcon
-                    className='data-key-toggle-collapsed'
-                    sx={{
-                      fontSize: '.8rem',
-                      '&:hover': { cursor: 'pointer' }
-                    }}
+                    size='small'
+                    className='data-key-toggle-collapsed jv-data-key-toggle'
                   />
                   )
               )
             : null
         }
-        <Box
+        <span
           ref={highlightContainer}
           className='data-key-key'
-          component='span'
         >
           {
             (isRoot && depth === 0
@@ -378,45 +350,38 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
                 : nestedIndex === undefined && (
                   isNumberKey
                     ? (
-                      <Box
-                        component='span'
-                        style={{
-                          color: numberKeyColor,
-                          userSelect: isNumberKey ? 'none' : 'auto'
-                        }}
+                      <span
+                        className='jv-number-key'
                       >
                         {key}
-                      </Box>
+                      </span>
                       )
                     : quotesOnKeys ? <>&quot;{key}&quot;</> : <>{key}</>
                 )
             )
           }
-        </Box>
+        </span>
         {
           (
             isRoot
               ? (rootName !== false && (
-                <DataBox
-                  className='data-key-colon'
-                  sx={{ mr: 0.5 }}
-                >:</DataBox>
+                <span
+                  className='data-key-colon jv-colon'
+                >:</span>
                 ))
               : nestedIndex === undefined && (
-                <DataBox
-                  className='data-key-colon'
-                  sx={{
-                    mr: 0.5,
-                    '.data-key-key:empty + &': { display: 'none' },
+                <span
+                  className='data-key-colon jv-colon'
+                  style={{
                     userSelect: isNumberKey ? 'none' : 'auto'
                   }}
-                >:</DataBox>
+                >:</span>
               )
           )
         }
         {PreComponent && <PreComponent {...downstreamProps} />}
         {(isHover && expandable && inspect) && actionIcons}
-      </DataBox>
+      </span>
       {
         (editing && editable)
           ? (Editor && (
@@ -431,16 +396,16 @@ export const DataKeyPair: FC<DataKeyPairProps> = (props) => {
           : (Component)
               ? <Component {...downstreamProps} />
               : (
-                <Box component='span' className='data-value-fallback'>
+                <span className='data-value-fallback'>
                   {`fallback: ${value}`}
-                </Box>
+                </span>
                 )
       }
       {PostComponent && <PostComponent {...downstreamProps} />}
-      {!last && displayComma && <DataBox>,</DataBox>}
+      {!last && displayComma && <span className='jv-inline-block'>,</span>}
       {(isHover && expandable && !inspect) && actionIcons}
       {(isHover && !expandable) && actionIcons}
       {(!isHover && editing) && actionIcons}
-    </Box>
+    </div>
   )
 }

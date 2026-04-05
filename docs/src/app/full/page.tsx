@@ -150,7 +150,7 @@ const imageDataType = defineDataType<string>({
 
 const LinkIcon = (props: SvgIconProps) => (
   // <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' strokeWidth='2' stroke='currentColor' fill='none' strokeLinecap='round' strokeLinejoin='round'>
-  <SvgIcon {...props}>
+  <SvgIcon {...props} className='jv-icon'>
     <path stroke='none' d='M0 0h24v24H0z' fill='none'></path>
     <path stroke='currentcolor' d='M11 7h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5' fill='none'></path>
     <path stroke='currentcolor' d='M10 14l10 -10'></path>
@@ -245,6 +245,7 @@ const IndexPage: FC = () => {
           gap: '10px',
           minHeight: '64px',
           paddingX: '5px',
+          paddingY: '10px',
           pb: '10px',
           mt: '64px'
         }}
@@ -389,8 +390,9 @@ const IndexPage: FC = () => {
             }, []
           )
         }
-        sx={{
-          paddingX: 2
+        style={{
+          paddingLeft: '16px',
+          paddingRight: '16px'
         }}
       />
     </div>

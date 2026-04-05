@@ -1,4 +1,6 @@
-import type React from 'react'
+import '../../style.css'
+
+import type { PropsWithChildren } from 'react'
 
 export const metadata = {
   title: 'Next.js',
@@ -7,9 +9,7 @@ export const metadata = {
 
 export default function RootLayout ({
   children
-}: {
-  children: React.ReactNode
-}) {
+}: PropsWithChildren) {
   return (
     <html lang='en'>
       <body>{children}</body>

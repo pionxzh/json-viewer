@@ -1,6 +1,3 @@
-import { Box } from '@mui/material'
-
-import { useJsonViewerStore } from '../../stores/JsonViewerStore'
 import { defineEasyType } from './defineEasyType'
 
 const isInt = (n: number) => n % 1 === 0
@@ -14,19 +11,10 @@ export const nanType = defineEasyType<number>({
   // allow deserialize the value back to number
   deserialize: (value) => parseFloat(value),
   Renderer: () => {
-    const backgroundColor = useJsonViewerStore(store => store.colorspace.base02)
     return (
-      <Box
-        sx={{
-          backgroundColor,
-          fontSize: '0.8rem',
-          fontWeight: 'bold',
-          borderRadius: '3px',
-          padding: '0.5px 2px'
-        }}
-      >
+      <div className='jv-type-nan'>
         NaN
-      </Box>
+      </div>
     )
   }
 })

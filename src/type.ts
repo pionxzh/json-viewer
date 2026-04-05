@@ -1,4 +1,3 @@
-import type { SxProps, Theme } from '@mui/material/styles'
 import type { ComponentType, CSSProperties, Dispatch, FC, SetStateAction } from 'react'
 
 import type { Colorspace } from './theme/base16'
@@ -145,12 +144,6 @@ export type JsonViewerProps<T = unknown> = {
   theme?: JsonViewerTheme
   className?: string
   style?: CSSProperties
-  /**
-   * [The `sx` prop](https://mui.com/system/getting-started/the-sx-prop/) lets you style elements inline, using values from the theme.
-   *
-   * @see https://mui.com/system/getting-started/the-sx-prop/
-   */
-  sx?: SxProps<Theme>
 
   /**
    * Indent width for nested objects

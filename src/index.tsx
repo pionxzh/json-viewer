@@ -1,7 +1,5 @@
-import {
-  createTheme, Paper,
-  ThemeProvider
-} from '@mui/material'
+import './style.css'
+
 import clsx from 'clsx'
 import type { FC, ReactElement } from 'react'
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react'
@@ -19,6 +17,7 @@ import {
   TypeRegistryStoreContext,
   useTypeRegistryStore
 } from './stores/typeRegistry'
+import { generateCSSVariables } from './styles/cssVariables'
 import { darkColorspace, lightColorspace } from './theme/base16'
 import type { JsonViewerProps } from './type'
 
@@ -107,18 +106,16 @@ const JsonViewerInner: FC<JsonViewerProps> = (props) => {
   const value = useJsonViewerStore(store => store.value)
   const prevValue = useJsonViewerStore(store => store.prevValue)
   const emptyPath = useMemo(() => [], [])
+  const colorspace = useJsonViewerStore(store => store.colorspace)
+  const cssVariables = useMemo(() => generateCSSVariables(colorspace), [colorspace])
   const setHover = useJsonViewerStore(store => store.setHover)
   const onMouseLeave = useCallback(() => setHover(null), [setHover])
   return (
-    <Paper
-      elevation={0}
-      className={clsx(themeCls, props.className)}
-      style={props.style}
-      sx={{
-        fontFamily: 'monospace',
-        userSelect: 'none',
-        contentVisibility: 'auto',
-        ...props.sx
+    <div
+      className={clsx('jv-root', themeCls, props.className)}
+      style={{
+        ...cssVariables,
+        ...props.style
       }}
       onMouseLeave={onMouseLeave}
     >
@@ -128,7 +125,7 @@ const JsonViewerInner: FC<JsonViewerProps> = (props) => {
         path={emptyPath}
         last={true}
       />
-    </Paper>
+    </div>
   )
 }
 
@@ -137,36 +134,6 @@ export const JsonViewer = function JsonViewer<Value> (props: JsonViewerProps<Val
   const themeType = useMemo(() => props.theme === 'auto'
     ? (isAutoDarkTheme ? 'dark' : 'light')
     : props.theme ?? 'light', [isAutoDarkTheme, props.theme])
-  const theme = useMemo(() => {
-    const backgroundColor = typeof themeType === 'object'
-      ? themeType.base00
-      : themeType === 'dark'
-        ? darkColorspace.base00
-        : lightColorspace.base00
-    const foregroundColor = typeof themeType === 'object'
-      ? themeType.base07
-      : themeType === 'dark'
-        ? darkColorspace.base07
-        : lightColorspace.base07
-    return createTheme({
-      components: {
-        MuiPaper: {
-          styleOverrides: {
-            root: {
-              backgroundColor,
-              color: foregroundColor
-            }
-          }
-        }
-      },
-      palette: {
-        mode: themeType === 'dark' ? 'dark' : 'light',
-        background: {
-          default: backgroundColor
-        }
-      }
-    })
-  }, [themeType])
   const mixedProps = { ...props, theme: themeType }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -174,13 +141,11 @@ export const JsonViewer = function JsonViewer<Value> (props: JsonViewerProps<Val
   const typeRegistryStore = useMemo(() => createTypeRegistryStore(), [])
 
   return (
-    <ThemeProvider theme={theme}>
-      <TypeRegistryStoreContext.Provider value={typeRegistryStore}>
-        <JsonViewerStoreContext.Provider value={jsonViewerStore}>
-          <JsonViewerInner {...mixedProps} />
-        </JsonViewerStoreContext.Provider>
-      </TypeRegistryStoreContext.Provider>
-    </ThemeProvider>
+    <TypeRegistryStoreContext.Provider value={typeRegistryStore}>
+      <JsonViewerStoreContext.Provider value={jsonViewerStore}>
+        <JsonViewerInner {...mixedProps} />
+      </JsonViewerStoreContext.Provider>
+    </TypeRegistryStoreContext.Provider>
   )
 }
 
